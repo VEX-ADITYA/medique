@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard — MediQueue</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <nav class="navbar" id="navbar">
+        <a href="index.html" class="logo">
+            <div class="logo-icon">🏥</div><span>Medi<span class="gradient-text">Queue</span></span>
+        </a>
+        <div class="nav-links" id="navLinks">
+            <a href="index.html">Home</a><a href="patient.html">Book Token</a><a href="doctor.html">Doctor Portal</a>
+            <a href="admin.html" class="active">Admin</a><a href="display.html">Live Display</a>
+        </div>
+        <div class="nav-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+                <div class="toggle-ball"></div>
+            </div>
+            <button class="hamburger" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
+        </div>
+    </nav>
+
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div
+                    style="display:flex;align-items:center;gap:var(--space-md);padding:var(--space-md);margin-bottom:var(--space-md);">
+                    <div class="doctor-avatar" style="background:linear-gradient(135deg,#ef4444,#f59e0b);">A</div>
+                    <div>
+                        <div style="font-weight:700;color:var(--text-primary);">Admin Panel</div>
+                        <div style="font-size:0.78rem;color:var(--text-muted);">Hospital Management</div>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Management</div>
+                <a href="#" class="sidebar-link active" onclick="showAdminSection('overview')"><span
+                        class="link-icon">📊</span> Overview</a>
+                <a href="#" class="sidebar-link" onclick="showAdminSection('doctors')"><span
+                        class="link-icon">👨‍⚕️</span> Manage Doctors</a>
+                <a href="#" class="sidebar-link" onclick="showAdminSection('tokens')"><span class="link-icon">🎫</span>
+                    All Tokens</a>
+                <a href="#" class="sidebar-link" onclick="showAdminSection('leave-requests')"><span
+                        class="link-icon">📅</span> Leave Requests <span class="link-badge" id="leaveCountBadge"
+                        style="display:none;">0</span></a>
+                <a href="#" class="sidebar-link" onclick="showAdminSection('departments')"><span
+                        class="link-icon">🏢</span> Departments</a>
+                <a href="#" class="sidebar-link" onclick="showAdminSection('settings')"><span
+                        class="link-icon">⚙️</span> Settings</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+
+            <!-- ===== OVERVIEW ===== -->
+            <div id="section-overview">
+                <div class="page-header">
+                    <h2>Admin <span class="gradient-text">Dashboard</span></h2>
+                    <p>Real-time overview of clinic OPD operations.</p>
+                </div>
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">🎫</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Total Tokens Today</div>
+                            <div class="stat-value" id="statTotalTokens">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">👨‍⚕️</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Active Doctors</div>
+                            <div class="stat-value" id="statActiveDoctors">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon yellow">⏳</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Waiting</div>
+                            <div class="stat-value" id="statWaiting">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon red">✅</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Completed</div>
+                            <div class="stat-value" id="statCompleted">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin-bottom:var(--space-md);">Recent Tokens</h3>
+                <div id="recentTokensList">
+                    <div class="empty-state">
+                        <div class="empty-icon">🎫</div>
+                        <h3>No tokens yet</h3>
+                        <p>Tokens will appear here as patients book them.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== MANAGE DOCTORS ===== -->
+            <div id="section-doctors" class="hidden">
+                <div class="page-header">
+                    <div class="page-header-actions">
+                        <div>
+                            <h2>Manage <span class="gradient-text">Doctors</span></h2>
+                            <p>Add, edit, or remove doctors from the system.</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="openModal('addDoctorModal')">+ Add Doctor</button>
+                    </div>
+                </div>
+                <div id="doctorsTableContainer">
+                    <div class="empty-state">
+                        <div class="empty-icon">👨‍⚕️</div>
+                        <h3>No doctors added yet</h3>
+                        <p>Click "Add Doctor" to add your first doctor.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== ALL TOKENS ===== -->
+            <div id="section-tokens" class="hidden">
+                <div class="page-header">
+                    <div class="page-header-actions">
+                        <div>
+                            <h2>All <span class="gradient-text">Tokens</span></h2>
+                            <p>View and manage all tokens for today.</p>
+                        </div>
+                        <div class="search-bar"><span class="search-icon">🔍</span><input type="text"
+                                placeholder="Search tokens..." id="tokenSearchInput" oninput="filterTokensTable()">
+                        </div>
+                    </div>
+                </div>
+                <div class="tabs" id="tokenTabs">
+                    <button class="tab active" onclick="filterTokensByStatus('all', this)">All <span
+                            id="tabAll">0</span></button>
+                    <button class="tab" onclick="filterTokensByStatus('waiting', this)">Waiting <span
+                            id="tabWaiting">0</span></button>
+                    <button class="tab" onclick="filterTokensByStatus('serving', this)">Serving <span
+                            id="tabServing">0</span></button>
+                    <button class="tab" onclick="filterTokensByStatus('completed', this)">Completed <span
+                            id="tabCompleted">0</span></button>
+                    <button class="tab" onclick="filterTokensByStatus('cancelled', this)">Cancelled <span
+                            id="tabCancelled">0</span></button>
+                </div>
+                <div id="tokensTableContainer">
+                    <div class="empty-state">
+                        <div class="empty-icon">🎫</div>
+                        <h3>No tokens today</h3>
+                        <p>Tokens will appear here as patients book them.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== LEAVE REQUESTS ===== -->
+            <div id="section-leave-requests" class="hidden">
+                <div class="page-header">
+                    <h2>Leave <span class="gradient-text">Requests</span></h2>
+                    <p>Review and approve/reject doctor leave applications.</p>
+                </div>
+                <div id="leaveRequestsList">
+                    <div class="empty-state">
+                        <div class="empty-icon">📅</div>
+                        <h3>No leave requests</h3>
+                        <p>Leave requests from doctors will appear here.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== DEPARTMENTS ===== -->
+            <div id="section-departments" class="hidden">
+                <div class="page-header">
+                    <h2>Department <span class="gradient-text">Overview</span></h2>
+                    <p>Department-wise doctor and token breakdown.</p>
+                </div>
+                <div class="schedule-grid" id="departmentsGrid">
+                    <div class="empty-state" style="grid-column:1/-1;">
+                        <div class="empty-icon">🏢</div>
+                        <h3>No departments yet</h3>
+                        <p>Departments will appear once doctors are added.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== SETTINGS ===== -->
+            <div id="section-settings" class="hidden">
+                <div class="page-header">
+                    <h2><span class="gradient-text">Settings</span></h2>
+                    <p>Configure system preferences.</p>
+                </div>
+                <div class="card card-flat" style="max-width:600px;">
+                    <h4 style="margin-bottom:var(--space-lg);">⚙️ General Settings</h4>
+                    <div class="form-group"><label class="form-label">Clinic Name</label><input type="text"
+                            class="form-input" id="settingClinicName" value=""></div>
+                    <div class="form-group"><label class="form-label">Default Session Capacity</label><input
+                            type="number" class="form-input" id="settingCapacity" value="15"></div>
+                    <div class="form-group"><label class="form-label">Avg. Consultation Time (min)</label><input
+                            type="number" class="form-input" id="settingAvgTime" value="12"></div>
+                    <div class="form-group"><label class="form-label">Auto-cancel no-show after (min)</label><input
+                            type="number" class="form-input" id="settingAutoCancel" value="15"></div>
+                    <button class="btn btn-primary" onclick="handleSaveSettings()">Save Settings</button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ===== ADD DOCTOR MODAL ===== -->
+    <div class="modal-overlay" id="addDoctorModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>👨‍⚕️ Add New Doctor</h3><button class="modal-close"
+                    onclick="closeModal('addDoctorModal')">✕</button>
+            </div>
+            <form id="addDoctorForm" onsubmit="handleAddDoctor(event)">
+                <div class="form-group"><label class="form-label">Full Name</label><input type="text" class="form-input"
+                        id="docName" placeholder="Dr. Full Name" required></div>
+                <div class="form-group"><label class="form-label">Department</label>
+                    <select class="form-select" id="docDepartment" required>
+                        <option value="">Select</option>
+                        <option value="General Medicine">General Medicine</option>
+                        <option value="Cardiology">Cardiology</option>
+                        <option value="Orthopedics">Orthopedics</option>
+                        <option value="Pediatrics">Pediatrics</option>
+                        <option value="Dermatology">Dermatology</option>
+                        <option value="ENT">ENT</option>
+                        <option value="Neurology">Neurology</option>
+                        <option value="Ophthalmology">Ophthalmology</option>
+                    </select>
+                </div>
+                <div class="form-group"><label class="form-label">Room Number</label><input type="text"
+                        class="form-input" id="docRoom" placeholder="e.g. 101" required></div>
+                <div class="form-group"><label class="form-label">Session Capacity (per day)</label><input type="number"
+                        class="form-input" id="docCapacity" value="15" required></div>
+                <div class="form-group"><label class="form-label">Available Time Slots (comma separated)</label><input
+                        type="text" class="form-input" id="docSlots" placeholder="9:00 AM, 9:15 AM, 9:30 AM, ..."
+                        required></div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary"
+                        onclick="closeModal('addDoctorModal')">Cancel</button><button type="submit"
+                        class="btn btn-primary">Add Doctor</button></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== EDIT DOCTOR MODAL ===== -->
+    <div class="modal-overlay" id="editDoctorModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>✏️ Edit Doctor</h3><button class="modal-close" onclick="closeModal('editDoctorModal')">✕</button>
+            </div>
+            <form id="editDoctorForm" onsubmit="handleEditDoctor(event)">
+                <input type="hidden" id="editDocId">
+                <div class="form-group"><label class="form-label">Full Name</label><input type="text" class="form-input"
+                        id="editDocName" required></div>
+                <div class="form-group"><label class="form-label">Department</label>
+                    <select class="form-select" id="editDocDepartment" required>
+                        <option value="General Medicine">General Medicine</option>
+                        <option value="Cardiology">Cardiology</option>
+                        <option value="Orthopedics">Orthopedics</option>
+                        <option value="Pediatrics">Pediatrics</option>
+                        <option value="Dermatology">Dermatology</option>
+                        <option value="ENT">ENT</option>
+                        <option value="Neurology">Neurology</option>
+                        <option value="Ophthalmology">Ophthalmology</option>
+                    </select>
+                </div>
+                <div class="form-group"><label class="form-label">Room Number</label><input type="text"
+                        class="form-input" id="editDocRoom" required></div>
+                <div class="form-group"><label class="form-label">Capacity</label><input type="number"
+                        class="form-input" id="editDocCapacity" required></div>
+                <div class="form-group"><label class="form-label">Slots (comma separated)</label><input type="text"
+                        class="form-input" id="editDocSlots" required></div>
+                <div class="form-group"><label class="form-label">Status</label>
+                    <select class="form-select" id="editDocStatus">
+                        <option value="active">Active</option>
+                        <option value="on-leave">On Leave</option>
+                    </select>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary"
+                        onclick="closeModal('editDoctorModal')">Cancel</button><button type="submit"
+                        class="btn btn-primary">Save Changes</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Portal — MediQueue</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <nav class="navbar" id="navbar">
+        <a href="index.html" class="logo">
+            <div class="logo-icon">🏥</div><span>Medi<span class="gradient-text">Queue</span></span>
+        </a>
+        <div class="nav-links" id="navLinks">
+            <a href="index.html">Home</a><a href="patient.html">Book Token</a>
+            <a href="doctor.html" class="active">Doctor Portal</a><a href="admin.html">Admin</a><a
+                href="display.html">Live Display</a>
+        </div>
+        <div class="nav-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+                <div class="toggle-ball"></div>
+            </div>
+            <button class="hamburger" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
+        </div>
+    </nav>
+
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div
+                    style="display:flex;align-items:center;gap:var(--space-md);padding:var(--space-md);margin-bottom:var(--space-md);">
+                    <div class="doctor-avatar" id="docAvatar">DR</div>
+                    <div>
+                        <div style="font-weight:700;color:var(--text-primary);" id="docPortalName">Select Your Profile
+                        </div>
+                        <div style="font-size:0.78rem;color:var(--text-muted);" id="docPortalDept">—</div>
+                    </div>
+                </div>
+                <!-- Doctor selector -->
+                <div style="padding:0 var(--space-md) var(--space-md); ">
+                    <select class="form-select" id="doctorSelector" onchange="selectDoctor()"
+                        style="font-size:0.85rem;">
+                        <option value="">Choose your profile...</option>
+                    </select>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Dashboard</div>
+                <a href="#" class="sidebar-link active" onclick="showDoctorSection('queue')"><span
+                        class="link-icon">📋</span> Today's Queue</a>
+                <a href="#" class="sidebar-link" onclick="showDoctorSection('schedule')"><span
+                        class="link-icon">📅</span> My Schedule</a>
+                <a href="#" class="sidebar-link" onclick="showDoctorSection('leave')"><span class="link-icon">🏖️</span>
+                    Apply Leave</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+
+            <!-- ===== NO DOCTOR SELECTED ===== -->
+            <div id="section-no-doctor">
+                <div class="empty-state" style="margin-top:var(--space-2xl);">
+                    <div class="empty-icon">👨‍⚕️</div>
+                    <h3>Select Your Profile</h3>
+                    <p>Choose your doctor profile from the sidebar dropdown to view your queue and manage your schedule.
+                    </p>
+                </div>
+            </div>
+
+            <!-- ===== TODAY'S QUEUE ===== -->
+            <div id="section-queue" class="hidden">
+                <div class="page-header">
+                    <h2>Today's <span class="gradient-text">Queue</span></h2>
+                    <p id="queueSubtitle">Manage your patient queue in real-time.</p>
+                </div>
+
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-icon green">🟢</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Now Serving</div>
+                            <div class="stat-value" id="qStatServing">—</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon yellow">⏳</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Waiting</div>
+                            <div class="stat-value" id="qStatWaiting">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon blue">✅</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Completed</div>
+                            <div class="stat-value" id="qStatCompleted">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon red">📊</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Total</div>
+                            <div class="stat-value" id="qStatTotal">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-md mb-lg">
+                    <button class="btn btn-primary" id="nextPatientBtn" onclick="callNextPatient()">▶ Next
+                        Patient</button>
+                    <button class="btn btn-success" id="completeBtn" onclick="completeCurrent()" disabled>✅ Done — Mark
+                        Complete</button>
+                </div>
+
+                <h3 style="margin-bottom:var(--space-md);">Patient Queue</h3>
+                <div id="queueList">
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <h3>No patients yet</h3>
+                        <p>Tokens will appear here as patients book with you.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== MY SCHEDULE ===== -->
+            <div id="section-schedule" class="hidden">
+                <div class="page-header">
+                    <h2>My <span class="gradient-text">Schedule</span></h2>
+                    <p>Your available time slots for today.</p>
+                </div>
+                <div id="scheduleInfo">
+                    <div class="empty-state">
+                        <div class="empty-icon">📅</div>
+                        <h3>Select your profile first</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== APPLY LEAVE ===== -->
+            <div id="section-leave" class="hidden">
+                <div class="page-header">
+                    <h2>Apply for <span class="gradient-text">Leave</span></h2>
+                    <p>Submit a leave request for admin approval.</p>
+                </div>
+                <div class="card card-flat" style="max-width:600px;">
+                    <h4 style="margin-bottom:var(--space-lg);">📝 Leave Application</h4>
+                    <form id="leaveForm" onsubmit="handleLeaveSubmit(event)">
+                        <div class="form-group"><label class="form-label">Leave Date</label><input type="date"
+                                class="form-input" id="leaveDate" required></div>
+                        <div class="form-group"><label class="form-label">Leave Type</label>
+                            <select class="form-select" id="leaveType" required>
+                                <option value="planned">Planned Leave</option>
+                                <option value="emergency">Emergency Leave</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label class="form-label">Session</label>
+                            <select class="form-select" id="leaveSession" required>
+                                <option value="full">Full Day</option>
+                                <option value="morning">Morning Only</option>
+                                <option value="afternoon">Afternoon Only</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label class="form-label">Reason</label>
+                            <textarea class="form-textarea" id="leaveReason" rows="3" placeholder="Reason for leave..."
+                                required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit Leave Request</button>
+                    </form>
+                </div>
+
+                <h3 style="margin-top:var(--space-xl);margin-bottom:var(--space-md);">Your Previous Requests</h3>
+                <div id="myLeaveRequests">
+                    <div class="empty-state">
+                        <div class="empty-icon">📅</div>
+                        <h3>No leave requests yet</h3>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/doctor.js"></script>
+</body>
+
+</html>

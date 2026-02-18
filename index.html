@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MediQueue - Automated Clinic Token & Availability Management System. Say goodbye to long queues with smart digital OPD management.">
+  <title>MediQueue — Smart Clinic Token Management</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">🏥</div>
+      <span>Medi<span class="gradient-text">Queue</span></span>
+    </a>
+
+    <div class="nav-links" id="navLinks">
+      <a href="index.html" class="active">Home</a>
+      <a href="patient.html">Book Token</a>
+      <a href="doctor.html">Doctor Portal</a>
+      <a href="admin.html">Admin</a>
+      <a href="display.html">Live Display</a>
+    </div>
+
+    <div class="nav-actions">
+      <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
+        <div class="toggle-ball"></div>
+      </div>
+      <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===== HERO SECTION ===== -->
+  <section class="hero">
+    <div class="hero-bg">
+      <div class="circle"></div>
+      <div class="circle"></div>
+      <div class="circle"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span>🚀</span> Smart Healthcare Solution
+      </div>
+      <h1>No More <span class="gradient-text">Long Queues</span> at the Clinic</h1>
+      <p>MediQueue automates OPD token allocation, tracks doctor availability in real-time, and keeps patients informed — all from one powerful dashboard.</p>
+      <div class="hero-actions">
+        <a href="patient.html" class="btn btn-primary btn-lg">
+          📋 Book Your Token
+        </a>
+        <a href="display.html" class="btn btn-secondary btn-lg">
+          📺 View Live Queue
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== STATS BANNER ===== -->
+  <section class="section" style="padding-top: 0;">
+    <div class="stats-row container">
+      <div class="stat-card">
+        <div class="stat-icon blue">⚡</div>
+        <div class="stat-info">
+          <div class="stat-label">Avg. Wait Time Reduced</div>
+          <div class="stat-value">70%</div>
+          <div class="stat-change up">↑ Faster than manual system</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">👨‍⚕️</div>
+        <div class="stat-info">
+          <div class="stat-label">Active Doctors</div>
+          <div class="stat-value">24</div>
+          <div class="stat-change up">↑ Across 8 departments</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon yellow">🎫</div>
+        <div class="stat-info">
+          <div class="stat-label">Tokens Today</div>
+          <div class="stat-value">186</div>
+          <div class="stat-change up">↑ 12% from yesterday</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon red">😃</div>
+        <div class="stat-info">
+          <div class="stat-label">Patient Satisfaction</div>
+          <div class="stat-value">96%</div>
+          <div class="stat-change up">↑ 15% improvement</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FEATURES SECTION ===== -->
+  <section class="section" id="features">
+    <div class="section-header">
+      <h2>Why <span class="gradient-text">MediQueue</span>?</h2>
+      <p>Built to solve every pain point of traditional OPD management systems.</p>
+    </div>
+    <div class="features-grid">
+      <div class="card feature-card">
+        <div class="feature-icon">🎫</div>
+        <h4>Dynamic Token Allocation</h4>
+        <p>Tokens are assigned automatically based on doctor session capacity and real-time availability. No more chaos.</p>
+      </div>
+      <div class="card feature-card">
+        <div class="feature-icon">📅</div>
+        <h4>Leave Management</h4>
+        <p>Doctors can mark planned or emergency leave. Patients are instantly notified with rescheduling options.</p>
+      </div>
+      <div class="card feature-card">
+        <div class="feature-icon">📺</div>
+        <h4>Live Display Board</h4>
+        <p>A real-time display shows current token numbers, estimated wait times, and queue progress for each doctor.</p>
+      </div>
+      <div class="card feature-card">
+        <div class="feature-icon">📱</div>
+        <h4>SMS/WhatsApp Alerts</h4>
+        <p>Automated notifications keep patients informed about their queue position, delays, and cancellations.</p>
+      </div>
+      <div class="card feature-card">
+        <div class="feature-icon">📊</div>
+        <h4>Analytics Dashboard</h4>
+        <p>Admins get real-time insights on patient flow, peak hours, doctor performance, and wait time trends.</p>
+      </div>
+      <div class="card feature-card">
+        <div class="feature-icon">🔒</div>
+        <h4>Secure & Reliable</h4>
+        <p>Role-based access for patients, doctors, and admins. Data is encrypted and stored securely in the cloud.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== HOW IT WORKS ===== -->
+  <section class="section" id="how-it-works" style="background: var(--bg-secondary);">
+    <div class="section-header">
+      <h2>How It <span class="gradient-text">Works</span></h2>
+      <p>Three simple steps to a better OPD experience.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="card step-card">
+        <div class="step-number">1</div>
+        <h4>Select Your Doctor</h4>
+        <p>Browse available doctors by department, check their schedule and available slots for the day.</p>
+      </div>
+      <div class="card step-card">
+        <div class="step-number">2</div>
+        <h4>Get Your Token</h4>
+        <p>Book a token instantly. You'll receive a confirmation with your token number and estimated time.</p>
+      </div>
+      <div class="card step-card">
+        <div class="step-number">3</div>
+        <h4>Track in Real-Time</h4>
+        <p>Monitor the live queue from your phone. Get notified when your turn is approaching.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA SECTION ===== -->
+  <section class="section text-center">
+    <div class="section-header">
+      <h2>Ready to <span class="gradient-text">Revolutionize</span> Your OPD?</h2>
+      <p>Join hundreds of clinics that have already eliminated long waiting times.</p>
+    </div>
+    <div class="hero-actions">
+      <a href="patient.html" class="btn btn-primary btn-lg">Get Started — It's Free</a>
+      <a href="admin.html" class="btn btn-outline btn-lg">Admin Login</a>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="logo" style="justify-content: center; margin-bottom: var(--space-md); display: flex; align-items: center; gap: 8px;">
+        <div class="logo-icon" style="width:32px; height:32px; background:var(--accent-gradient); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1rem; color:#fff;">🏥</div>
+        <span style="font-family: var(--font-primary); font-weight: 800; font-size: 1.2rem;">Medi<span class="gradient-text">Queue</span></span>
+      </div>
+      <p>Automated Clinic Token & Availability Management System</p>
+      <p style="margin-top: var(--space-sm); font-size: 0.82rem; color: var(--text-muted);">© 2026 MediQueue. Built for EK-6 Hackathon.</p>
+    </div>
+  </footer>
+
+  <!-- ===== TOAST CONTAINER ===== -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="js/theme.js"></script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Queue Display — MediQueue</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .live-clock {
+            font-family: var(--font-primary);
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+
+        .marquee-bar {
+            background: var(--accent-gradient);
+            color: #fff;
+            padding: 10px var(--space-lg);
+            font-weight: 600;
+            font-size: 0.9rem;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .marquee-bar span {
+            display: inline-block;
+            animation: marquee 25s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% {
+                transform: translateX(100vw);
+            }
+
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        .display-summary {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: center;
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+        }
+
+        .summary-pill {
+            padding: 12px 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            text-align: center;
+            backdrop-filter: blur(16px);
+            min-width: 160px;
+        }
+
+        .summary-pill .pill-label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+        }
+
+        .summary-pill .pill-value {
+            font-family: var(--font-primary);
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar" id="navbar">
+        <a href="index.html" class="logo">
+            <div class="logo-icon">🏥</div><span>Medi<span class="gradient-text">Queue</span></span>
+        </a>
+        <div class="nav-links" id="navLinks">
+            <a href="index.html">Home</a><a href="patient.html">Book Token</a><a href="doctor.html">Doctor Portal</a>
+            <a href="admin.html">Admin</a><a href="display.html" class="active">Live Display</a>
+        </div>
+        <div class="nav-actions">
+            <div class="live-clock" id="liveClock">--:--:-- AM</div>
+            <div class="theme-toggle" onclick="toggleTheme()">
+                <div class="toggle-ball"></div>
+            </div>
+            <button class="hamburger" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
+        </div>
+    </nav>
+
+    <!-- Marquee -->
+    <div class="marquee-bar" style="margin-top:65px;" id="marqueeBar">
+        <span>📢 Welcome to MediQueue Live Display — Real-time queue information for all departments 🏥</span>
+    </div>
+
+    <div class="display-board">
+        <div class="display-header">
+            <h1>Live <span class="gradient-text">Token Display</span></h1>
+            <p style="font-size:1.05rem;">Real-time queue status across all departments &bull; <span
+                    id="displayDate">—</span></p>
+        </div>
+
+        <!-- Summary Pills -->
+        <div class="display-summary">
+            <div class="summary-pill">
+                <div class="pill-label">Total Tokens</div>
+                <div class="pill-value" id="dispTotal">0</div>
+            </div>
+            <div class="summary-pill">
+                <div class="pill-label">Now Serving</div>
+                <div class="pill-value" id="dispServing" style="color:var(--status-success);">0</div>
+            </div>
+            <div class="summary-pill">
+                <div class="pill-label">Waiting</div>
+                <div class="pill-value" id="dispWaiting" style="color:var(--status-warning);">0</div>
+            </div>
+            <div class="summary-pill">
+                <div class="pill-label">Completed</div>
+                <div class="pill-value" id="dispCompleted">0</div>
+            </div>
+        </div>
+
+        <!-- Doctor Queue Cards — Rendered Dynamically -->
+        <div class="display-grid" id="displayGrid">
+            <div class="empty-state" style="grid-column:1/-1;">
+                <div class="spinner" style="margin:0 auto var(--space-md);"></div>
+                <h3>Loading live data...</h3>
+                <p>Connecting to database for real-time updates.</p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer" style="margin-top:var(--space-xl);">
+        <p style="font-size:0.85rem;">🏥 MediQueue — Automated Clinic Token & Availability Management System</p>
+    </footer>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script>
+        let displayDoctors = [];
+        let displayTokens = [];
+
+        // Live Clock
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('liveClock').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            const dateEl = document.getElementById('displayDate');
+            if (dateEl) dateEl.textContent = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Listen to doctors and tokens
+        listenDoctors(function (doctors) {
+            displayDoctors = doctors;
+            renderDisplayBoard();
+        });
+
+        listenTodayTokens(function (tokens) {
+            displayTokens = tokens;
+            renderDisplayBoard();
+            updateDisplaySummary();
+        });
+
+        function updateDisplaySummary() {
+            document.getElementById('dispTotal').textContent = displayTokens.length;
+            document.getElementById('dispServing').textContent = displayTokens.filter(t => t.status === 'serving').length;
+            document.getElementById('dispWaiting').textContent = displayTokens.filter(t => t.status === 'waiting').length;
+            document.getElementById('dispCompleted').textContent = displayTokens.filter(t => t.status === 'completed').length;
+        }
+
+        function renderDisplayBoard() {
+            const grid = document.getElementById('displayGrid');
+
+            if (displayDoctors.length === 0) {
+                grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><div class="empty-icon">👨‍⚕️</div><h3>No doctors configured</h3><p>Add doctors from the Admin panel to see them here.</p></div>';
+                return;
+            }
+
+            // Gradient colors for cards
+            const gradients = [
+                'linear-gradient(135deg,#3b82f6,#06b6d4)',
+                'linear-gradient(135deg,#a855f7,#ec4899)',
+                'linear-gradient(135deg,#f59e0b,#ef4444)',
+                'linear-gradient(135deg,#10b981,#3b82f6)',
+                'linear-gradient(135deg,#6366f1,#8b5cf6)',
+                'linear-gradient(135deg,#f43f5e,#f59e0b)',
+                'linear-gradient(135deg,#14b8a6,#22d3ee)',
+                'linear-gradient(135deg,#8b5cf6,#d946ef)'
+            ];
+
+            grid.innerHTML = '';
+
+            displayDoctors.forEach(function (doc, index) {
+                const isOnLeave = doc.status === 'on-leave';
+                const docTokens = displayTokens.filter(t => t.doctorId === doc.id);
+                const serving = docTokens.filter(t => t.status === 'serving');
+                const waiting = docTokens.filter(t => t.status === 'waiting');
+                const grad = gradients[index % gradients.length];
+
+                const card = document.createElement('div');
+                card.className = 'display-card';
+                if (isOnLeave) card.style.opacity = '0.5';
+
+                let headerStyle = isOnLeave
+                    ? 'background:linear-gradient(135deg,#6b7280,#9ca3af);'
+                    : 'background:' + grad + ';';
+
+                let bodyHtml = '';
+                if (isOnLeave) {
+                    bodyHtml = '<div style="font-size:0.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">' + doc.department + '</div>'
+                        + '<div class="current-token-display"><div class="current-token-label" style="color:var(--status-danger);">On Leave Today</div>'
+                        + '<div class="current-token-number" style="font-size:3rem;background:none;-webkit-text-fill-color:var(--text-muted);">—</div></div>'
+                        + '<div style="text-align:center;color:var(--text-muted);font-size:0.88rem;margin-top:var(--space-md);">Patients have been rescheduled</div>';
+                } else {
+                    const currentToken = serving.length > 0 ? serving[0].tokenNumber : '—';
+                    const nextTokens = waiting.slice(0, 3);
+                    const avgWait = waiting.length * 12;
+
+                    bodyHtml = '<div style="font-size:0.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">' + doc.department + '</div>'
+                        + '<div class="current-token-display"><div class="current-token-label">Now Serving</div>'
+                        + '<div class="current-token-number">' + currentToken + '</div></div>'
+                        + '<div class="next-tokens">';
+                    if (nextTokens.length > 0) {
+                        bodyHtml += nextTokens.map(function (t, i) {
+                            return '<span class="next-token-pill">' + (i === 0 ? 'Next: ' : '') + t.tokenNumber + '</span>';
+                        }).join('');
+                    } else {
+                        bodyHtml += '<span class="next-token-pill">No one waiting</span>';
+                    }
+                    bodyHtml += '</div>'
+                        + '<div style="margin-top:var(--space-md);display:flex;justify-content:space-between;font-size:0.85rem;">'
+                        + '<span style="color:var(--text-muted);">⏱ Wait: ~' + avgWait + ' min</span>'
+                        + '<span><span class="badge ' + (waiting.length > 5 ? 'badge-warning' : 'badge-success') + '">' + waiting.length + ' remaining</span></span></div>';
+                }
+
+                card.innerHTML = '<div class="display-card-header" style="' + headerStyle + '"><h3>' + doc.name + '</h3><span class="room-number">Room ' + (doc.room || '—') + '</span></div>'
+                    + '<div class="display-card-body">' + bodyHtml + '</div>';
+
+                grid.appendChild(card);
+            });
+
+            // Update marquee with on-leave doctors
+            const onLeave = displayDoctors.filter(d => d.status === 'on-leave');
+            let marqueeText = '📢 Welcome to MediQueue Live Display — Real-time queue information for all departments';
+            if (onLeave.length > 0) {
+                marqueeText += ' — ' + onLeave.map(d => d.name + ' (' + d.department + ') is on leave today').join(' — ');
+                marqueeText += ' — Patients have been notified and rescheduled.';
+            }
+            marqueeText += ' — Have a healthy day! 🏥';
+            document.querySelector('.marquee-bar span').textContent = marqueeText;
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Token — MediQueue</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <nav class="navbar" id="navbar">
+        <a href="index.html" class="logo">
+            <div class="logo-icon">🏥</div><span>Medi<span class="gradient-text">Queue</span></span>
+        </a>
+        <div class="nav-links" id="navLinks">
+            <a href="index.html">Home</a><a href="patient.html" class="active">Book Token</a>
+            <a href="doctor.html">Doctor Portal</a><a href="admin.html">Admin</a><a href="display.html">Live Display</a>
+        </div>
+        <div class="nav-actions">
+            <div class="theme-toggle" onclick="toggleTheme()">
+                <div class="toggle-ball"></div>
+            </div>
+            <button class="hamburger" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
+        </div>
+    </nav>
+
+    <div class="dashboard-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Patient Menu</div>
+                <a href="#" class="sidebar-link active" onclick="showSection('book')"><span class="link-icon">🎫</span>
+                    Book Token</a>
+                <a href="#" class="sidebar-link" onclick="showSection('my-tokens')"><span class="link-icon">📋</span> My
+                    Tokens</a>
+                <a href="#" class="sidebar-link" onclick="showSection('doctors')"><span class="link-icon">👨‍⚕️</span>
+                    View Doctors</a>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Quick Links</div>
+                <a href="display.html" class="sidebar-link"><span class="link-icon">📺</span> Live Queue</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+
+            <!-- ===== BOOK TOKEN ===== -->
+            <div id="section-book">
+                <div class="page-header">
+                    <h2>Book Your <span class="gradient-text">Token</span></h2>
+                    <p>Select a department and doctor to get your OPD token instantly.</p>
+                </div>
+
+                <div class="card card-flat" style="max-width:700px;">
+                    <h3 style="margin-bottom:var(--space-lg);">📋 New Token Booking</h3>
+                    <form id="bookingForm" onsubmit="handleBooking(event)">
+                        <div class="form-group"><label class="form-label">Patient Name</label>
+                            <input type="text" class="form-input" id="patientName" placeholder="Enter your full name"
+                                required>
+                        </div>
+                        <div class="form-group"><label class="form-label">Phone Number</label>
+                            <input type="tel" class="form-input" id="patientPhone" placeholder="e.g. 9876543210"
+                                required>
+                        </div>
+                        <div class="form-group"><label class="form-label">Email Address</label>
+                            <input type="email" class="form-input" id="patientEmail" placeholder="your@email.com"
+                                required>
+                        </div>
+                        <div class="form-group"><label class="form-label">Department</label>
+                            <select class="form-select" id="department" onchange="fetchDoctorsForDept()" required>
+                                <option value="">Select Department</option>
+                                <option value="General Medicine">General Medicine</option>
+                                <option value="Cardiology">Cardiology</option>
+                                <option value="Orthopedics">Orthopedics</option>
+                                <option value="Pediatrics">Pediatrics</option>
+                                <option value="Dermatology">Dermatology</option>
+                                <option value="Neurology">Neurology</option>
+                                <option value="ENT">ENT</option>
+                                <option value="Ophthalmology">Ophthalmology</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label class="form-label">Select Doctor</label>
+                            <select class="form-select" id="doctor" onchange="updateSlots()" required>
+                                <option value="">Select a department first</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label class="form-label">Preferred Time Slot</label>
+                            <select class="form-select" id="timeSlot" required>
+                                <option value="">Select a doctor first</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label class="form-label">Symptoms / Reason for Visit</label>
+                            <textarea class="form-textarea" id="symptoms"
+                                placeholder="Briefly describe your symptoms..." rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-full" id="bookBtn">🎫 Book Token
+                            Now</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ===== MY TOKENS ===== -->
+            <div id="section-my-tokens" class="hidden">
+                <div class="page-header">
+                    <h2>My <span class="gradient-text">Tokens</span></h2>
+                    <p>Enter your phone number to see your booked tokens.</p>
+                </div>
+                <div class="card card-flat mb-lg" style="max-width:500px;">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label class="form-label">Your Phone Number</label>
+                        <div class="flex gap-md">
+                            <input type="tel" class="form-input" id="lookupPhone" placeholder="e.g. 9876543210">
+                            <button class="btn btn-primary" onclick="lookupMyTokens()">Search</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="myTokensList">
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <h3>Enter your phone number</h3>
+                        <p>Search by phone to view your booked tokens.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== VIEW DOCTORS ===== -->
+            <div id="section-doctors" class="hidden">
+                <div class="page-header">
+                    <div class="page-header-actions">
+                        <div>
+                            <h2>Available <span class="gradient-text">Doctors</span></h2>
+                            <p>Browse doctors by department and check availability.</p>
+                        </div>
+                        <div class="search-bar"><span class="search-icon">🔍</span><input type="text"
+                                placeholder="Search doctors..." id="doctorSearch" oninput="filterDoctorCards()"></div>
+                    </div>
+                </div>
+                <div class="schedule-grid" id="doctorsGrid">
+                    <div class="empty-state" style="grid-column:1/-1;">
+                        <div class="spinner" style="margin:0 auto var(--space-md);"></div>
+                        <h3>Loading doctors...</h3>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ===== BOOKING SUCCESS MODAL ===== -->
+    <div class="modal-overlay" id="bookingSuccessModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>🎉 Token Booked!</h3><button class="modal-close"
+                    onclick="closeModal('bookingSuccessModal')">✕</button>
+            </div>
+            <div style="text-align:center;padding:var(--space-lg) 0;">
+                <div style="font-size:4rem;margin-bottom:var(--space-md);">🎫</div>
+                <div class="current-token-number" id="bookedTokenNumber">—</div>
+                <p style="margin-top:var(--space-md);font-size:1rem;"><strong id="bookedDoctorName">—</strong></p>
+                <p id="bookedTimeSlot">—</p>
+                <p style="margin-top:var(--space-sm);color:var(--status-success);font-weight:600;">✅ Confirmation sent
+                    via Email & WhatsApp</p>
+            </div>
+            <div class="modal-footer" style="justify-content:center;">
+                <button class="btn btn-primary" onclick="closeModal('bookingSuccessModal')">Done</button>
+                <a href="display.html" class="btn btn-secondary">View Live Queue</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/patient.js"></script>
+</body>
+
+</html>
